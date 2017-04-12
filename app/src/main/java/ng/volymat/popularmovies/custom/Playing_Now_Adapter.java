@@ -72,6 +72,8 @@ public class Playing_Now_Adapter extends RecyclerView.Adapter<Playing_Now_Adapte
                 intent.putExtra("genre_id", item.getGenre());
                 intent.putExtra("overview", item.getOverview());
                 intent.putExtra("id", item.getId());
+                intent.putExtra("rating", item.getVote_average());
+                intent.putExtra("release_date", item.getRelease_date());
                 con.startActivity(intent);
             }
         });

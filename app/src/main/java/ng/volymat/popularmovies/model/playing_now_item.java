@@ -13,6 +13,10 @@ public class playing_now_item {
     private String overview;
     private String vote_average;
     private String backdrop;
+    private String release_date;
+
+
+
     private ArrayList<Integer> genre;
 
     public playing_now_item(){
@@ -20,14 +24,14 @@ public class playing_now_item {
     }
 
 
-    public playing_now_item(int id, String movie_title, String poster_path, String overview, String vote_average, String backdrop, ArrayList<Integer> genre) {
+    public playing_now_item(int id, String movie_title, String poster_path, String overview, String vote_average, String backdrop, ArrayList<Integer> genre, String release_date) {
         this.id = id;
         this.movie_title = movie_title;
         this.poster_path = poster_path;
         this.overview = overview;
         this.vote_average = vote_average;
         this.backdrop= backdrop;
-        this.genre = genre;
+        this.release_date = release_date;
 
     }
 
@@ -86,5 +90,13 @@ public class playing_now_item {
 
     public void setOverview(String overview) {
         this.overview = overview;
+    }
+
+    public String getRelease_date() {
+        return release_date;
+    }
+
+    public void setRelease_date(String release_date) {
+        this.release_date = release_date;
     }
 }

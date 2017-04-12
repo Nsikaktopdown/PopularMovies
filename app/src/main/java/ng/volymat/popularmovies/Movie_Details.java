@@ -38,7 +38,14 @@ public class Movie_Details extends AppCompatActivity {
     private ImageView imagePoster;
     private int mMutedColor = 0xFF333333;
     private TextView movie_genres, overview;
-    String movie_video_id ="";
+    String movie_video_id = "";
+    String poster_url;
+    String movTitle;
+    String overiew_info;
+    String release_date;
+
+    ArrayList<Integer> genre_raw_ids;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +60,18 @@ public class Movie_Details extends AppCompatActivity {
         CollapsingToolbarLayout cab = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 
 
-
         Intent intent = getIntent();
-        String poster_url = Playing_Now_Adapter.IMAGE_BASE_URL + intent.getStringExtra("backdrop_path");
-        String movTitle = intent.getStringExtra("movie_title");
-        String overiew_info = intent.getStringExtra("overview");
+        if (intent != null) {
+            poster_url = Playing_Now_Adapter.IMAGE_BASE_URL + intent.getStringExtra("backdrop_path");
+            movTitle = intent.getStringExtra("movie_title");
+            overiew_info = intent.getStringExtra("overview");
+            release_date = intent.getStringExtra("release_date");
 
-        ArrayList<Integer> genre_raw_ids = (ArrayList<Integer>) intent.getSerializableExtra("genre_id");
-        Toast.makeText(this, poster_url +" "+ movTitle, Toast.LENGTH_SHORT).show();
+
+            genre_raw_ids = (ArrayList<Integer>) intent.getSerializableExtra("genre_id");
+        }
+
+        //Toast.makeText(this, poster_url +" "+ movTitle, Toast.LENGTH_SHORT).show();
 
 
         movie_genres = (TextView) findViewById(R.id.movie_genre);
@@ -84,23 +95,23 @@ public class Movie_Details extends AppCompatActivity {
                     }
                 });
 
-            cab.setTitle(movTitle);
+        cab.setTitle(movTitle);
 
 
         Playing_Now_Adapter.getMovieGenre(genre_raw_ids, movie_genres);
         overview.setText(overiew_info);
 
-        String movie_id =  String.valueOf(getIntent().getIntExtra("id",0));
+        String movie_id = String.valueOf(getIntent().getIntExtra("id", 0));
         Toast.makeText(this, movie_id, Toast.LENGTH_SHORT).show();
         String video_url = "https://api.themoviedb.org/3/movie/" + movie_id + "/videos?api_key=" + Config.API_KEY + "&language=en-US";
         // making fresh volley request and getting json
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-               video_url, new Response.Listener<JSONObject>() {
+                video_url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 VolleyLog.d(TAG, "Response: " + jsonObject.toString());
                 if (jsonObject != null) {
-                   movieVideoUrl(jsonObject);
+                    movieVideoUrl(jsonObject);
 
                 }
             }
@@ -120,13 +131,13 @@ public class Movie_Details extends AppCompatActivity {
             public void onClick(View view) {
 
 
-
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + movie_video_id));
                 startActivity(intent);
 
             }
         });
     }
+
     private void movieVideoUrl(JSONObject response) {
         try {
             JSONArray feedArray = response.getJSONArray("results");

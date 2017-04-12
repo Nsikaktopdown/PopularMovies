@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity
                 item.setOverview(feedObj.getString("overview"));
                 item.setBackdrop(feedObj.getString("backdrop_path"));
                 item.setVote_average(feedObj.getString("vote_average"));
+                item.setRelease_date(feedObj.getString("release_date"));
 
                 // Genre is json array
                 JSONArray genreArry = feedObj.getJSONArray("genre_ids");

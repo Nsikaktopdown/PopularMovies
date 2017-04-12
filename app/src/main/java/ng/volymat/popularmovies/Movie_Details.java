@@ -37,12 +37,12 @@ public class Movie_Details extends AppCompatActivity {
     private static final String TAG = Movie_Details.class.getSimpleName();
     private ImageView imagePoster;
     private int mMutedColor = 0xFF333333;
-    private TextView movie_genres, overview;
+    private TextView movie_genres, overview, release_date_txt, rating_txt;
     String movie_video_id = "";
     String poster_url;
     String movTitle;
     String overiew_info;
-    String release_date;
+    String release_date, rating;
 
     ArrayList<Integer> genre_raw_ids;
 
@@ -59,6 +59,13 @@ public class Movie_Details extends AppCompatActivity {
 
         CollapsingToolbarLayout cab = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 
+        movie_genres = (TextView) findViewById(R.id.movie_genre);
+        imagePoster = (ImageView) findViewById(R.id.photo);
+        overview = (TextView) findViewById(R.id.overview_text);
+        release_date_txt = (TextView) findViewById(R.id.date_text);
+        rating_txt = (TextView) findViewById(R.id.rating_text);
+
+
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -66,17 +73,16 @@ public class Movie_Details extends AppCompatActivity {
             movTitle = intent.getStringExtra("movie_title");
             overiew_info = intent.getStringExtra("overview");
             release_date = intent.getStringExtra("release_date");
-
-
             genre_raw_ids = (ArrayList<Integer>) intent.getSerializableExtra("genre_id");
+            rating = intent.getStringExtra("rating");
+
+            overview.setText(overiew_info);
+            release_date_txt.setText(release_date);
+            rating_txt.setText(rating);
         }
 
         //Toast.makeText(this, poster_url +" "+ movTitle, Toast.LENGTH_SHORT).show();
 
-
-        movie_genres = (TextView) findViewById(R.id.movie_genre);
-        imagePoster = (ImageView) findViewById(R.id.photo);
-        overview = (TextView) findViewById(R.id.overview_text);
 
         ImageLoaderHelper.getInstance(getApplicationContext()).getImageLoader()
                 .get(poster_url, new ImageLoader.ImageListener() {
@@ -99,7 +105,7 @@ public class Movie_Details extends AppCompatActivity {
 
 
         Playing_Now_Adapter.getMovieGenre(genre_raw_ids, movie_genres);
-        overview.setText(overiew_info);
+
 
         String movie_id = String.valueOf(getIntent().getIntExtra("id", 0));
         Toast.makeText(this, movie_id, Toast.LENGTH_SHORT).show();

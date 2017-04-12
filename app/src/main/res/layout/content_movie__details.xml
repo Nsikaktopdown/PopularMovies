@@ -21,15 +21,47 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:text="@string/overvi"
-            android:textColor="#448AFF"
+            android:textColor="@color/light_blue"
             android:textSize="22sp" />
 
         <TextView
             android:id="@+id/overview_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#727272"
+            android:textColor="@color/textcolor"
             android:textSize="15sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/release_date"
+            android:textColor="@color/light_blue"
+            android:textSize="22sp" />
+        <TextView
+            android:layout_marginTop="7dp"
+            android:id="@+id/date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textcolor"
+            android:text="2015"
+            android:textSize="15sp" />
+        <TextView
+            android:layout_marginTop="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/rating"
+            android:textColor="@color/light_blue"
+            android:textSize="22sp" />
+        <TextView
+            android:layout_marginTop="7dp"
+            android:id="@+id/rating_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textcolor"
+            android:text="3.4*"
+            android:textSize="15sp" />
+
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

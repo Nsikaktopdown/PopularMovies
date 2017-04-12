@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">VolyMat</string>
+    <string name="action_settings">Settings</string>
+    <string name="overview">From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
+      "release_date": "2016-08-03",</string>
+    <string name="genre">Action, Horror</string>
+    <string name="title_activity_home">Home</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_movie__details">Udercover port</string>
+    <string name="overvi">Overview</string>
+
+</resources>

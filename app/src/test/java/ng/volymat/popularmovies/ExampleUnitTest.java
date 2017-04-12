@@ -1,4 +1,4 @@
-package ng.volymat.volymat;
+package ng.volymat.popularmovies;
 
 import org.junit.Test;
 

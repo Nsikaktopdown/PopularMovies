@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import ng.volymat.popularmovies.Movie_Details;
-import ng.volymat.volymat.R;
+import ng.volymat.popularmovies.R;
 import ng.volymat.popularmovies.model.playing_now_item;
 import ng.volymat.popularmovies.ui.DynamicHeightNetworkImageView;
 import ng.volymat.popularmovies.ui.ImageLoaderHelper;

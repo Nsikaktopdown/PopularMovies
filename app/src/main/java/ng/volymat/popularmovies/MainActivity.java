@@ -1,6 +1,10 @@
 package ng.volymat.popularmovies;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -8,6 +12,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,16 +25,43 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import ng.volymat.volymat.R;
+import ng.volymat.popularmovies.app.AppController;
+import ng.volymat.popularmovies.custom.Playing_Now_Adapter;
+import ng.volymat.popularmovies.model.playing_now_item;
+import ng.volymat.popularmovies.R;
+
+import static ng.volymat.popularmovies.Config.API_KEY;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private FragmentPagerAdapter mPagerAdapter;
-    private ViewPager mViewPager;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private List<playing_now_item> movieList = new ArrayList<>();
+    private RecyclerView recyclerView2;
+    private Playing_Now_Adapter mAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ProgressBar mProgressBar;
+    int columnCount = 2;
+    String sortingOrder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,24 +86,116 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        // Setting ViewPager for each Tabs
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
 
-        // Set Tabs inside Toolbar
-        TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
+        recyclerView2 = (RecyclerView) findViewById(R.id.movie_list);
+        mProgressBar = (ProgressBar) findViewById(R.id.loading);
+
+
+        mAdapter = new Playing_Now_Adapter(movieList);
+
+
+        GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
+        recyclerView2.setLayoutManager(layoutManager);
+        recyclerView2.setItemAnimator(new DefaultItemAnimator());
+        recyclerView2.setHasFixedSize(true);
+        recyclerView2.setAdapter(mAdapter);
+
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        sortingOrder = preferences.getString(getString(R.string.pref_sort_key),
+                getString(R.string.pref_sort_popular_value));
+
+        jsonReq(sortingOrder);
+
     }
-    // Add Fragments to Tabs
-    private void setupViewPager(ViewPager viewPager) {
-        MainActivity.Adapter adapter = new MainActivity.Adapter(getSupportFragmentManager());
-        adapter.addFragment(new Playing_Now(), "Now Playing");
-        adapter.addFragment(new Popular_Movie(), "Popular Movie");
 
-        viewPager.setAdapter(adapter);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        jsonReq(sortingOrder);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        jsonReq(sortingOrder);
 
     }
+
+    private void jsonReq(String sortOrder) {
+
+
+        final String API_KEY_PARAMS = "api_key";
+        Uri uri = Uri.parse(Config.BASE_URL).buildUpon()
+                .appendEncodedPath(sortOrder)
+                .appendQueryParameter(API_KEY_PARAMS, Config.API_KEY)
+                .build();
+
+        String url = uri.toString();
+
+        // making fresh volley request and getting json
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
+                url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                VolleyLog.d(TAG, "Response: " + jsonObject.toString());
+                mProgressBar.setVisibility(View.INVISIBLE);
+                if (jsonObject != null) {
+                    movieParser(jsonObject);
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                mProgressBar.setVisibility(View.INVISIBLE);
+                VolleyLog.d(TAG, "Response: " + volleyError.toString());
+                Toast.makeText(MainActivity.this, "Couldn't get movies", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+        // Adding request to volley request queue
+        AppController.getInstance().addToRequestQueue(jsonReq);
+
+    }
+
+    private void movieParser(JSONObject response) {
+        try {
+            JSONArray feedArray = response.getJSONArray("results");
+
+            for (int i = 0; i < feedArray.length(); i++) {
+                JSONObject feedObj = (JSONObject) feedArray.get(i);
+
+                playing_now_item item = new playing_now_item();
+                item.setId(feedObj.getInt("id"));
+                item.setMovie_title(feedObj.getString("title"));
+
+
+                item.setPoster_path(feedObj.getString("poster_path"));
+                item.setOverview(feedObj.getString("overview"));
+                item.setBackdrop(feedObj.getString("backdrop_path"));
+                item.setVote_average(feedObj.getString("vote_average"));
+
+                // Genre is json array
+                JSONArray genreArry = feedObj.getJSONArray("genre_ids");
+                ArrayList<Integer> genre = new ArrayList<Integer>();
+                for (int j = 0; j < genreArry.length(); j++) {
+                    genre.add((Integer) genreArry.get(j));
+                }
+                item.setGenre(genre);
+
+                movieList.add(item);
+            }
+
+            // notify data changes to list adapater
+            mAdapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -96,6 +223,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;
         }
 
@@ -126,32 +254,5 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    static class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public Adapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
 }

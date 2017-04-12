@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import ng.volymat.popularmovies.custom.Playing_Now_Adapter;
-import ng.volymat.volymat.R;
+import ng.volymat.popularmovies.R;
 import ng.volymat.popularmovies.app.AppController;
 import ng.volymat.popularmovies.ui.ImageLoaderHelper;
 

@@ -29,7 +29,7 @@
             android:id="@+id/movie_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Terminator"/>
+           />
 
         <TextView
             android:ellipsize="end"
@@ -50,7 +50,6 @@
         <TextView
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/movie_name"
-            android:text="4.2"
             android:fontFamily="sans-serif-condensed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

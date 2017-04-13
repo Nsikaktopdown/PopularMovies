@@ -9,6 +9,7 @@ This is very basic for a beginner Android developer. It just simply making HTTP 
 ### Prerequisites
 
 Android Studio 2.0+
+Get your API key from [here] (www.themoviedb.org)
 
 
 

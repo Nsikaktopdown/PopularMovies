@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -19,8 +20,10 @@
 
     <style name="Theme.Bacon.Backdrop" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_height">300dp</item>
         <item name="android:scaleType">fitXY</item>
         <item name="android:fitsSystemWindows">true</item>
+
     </style>
+
 </resources>

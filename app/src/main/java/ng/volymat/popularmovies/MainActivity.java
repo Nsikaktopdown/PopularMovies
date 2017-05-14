@@ -2,6 +2,7 @@ package ng.volymat.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,6 +12,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -46,21 +50,33 @@ import java.util.List;
 
 import ng.volymat.popularmovies.app.AppController;
 import ng.volymat.popularmovies.custom.Playing_Now_Adapter;
+import ng.volymat.popularmovies.data.MovieContract;
 import ng.volymat.popularmovies.model.playing_now_item;
 import ng.volymat.popularmovies.R;
+import ng.volymat.popularmovies.sync.MovieSynIntentUtil;
 
+import static android.R.attr.data;
 import static ng.volymat.popularmovies.Config.API_KEY;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor>, Playing_Now_Adapter.playingAdapterOnClickHandler {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private List<playing_now_item> movieList = new ArrayList<>();
     private RecyclerView recyclerView2;
     private Playing_Now_Adapter mAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private int mPosition = RecyclerView.NO_POSITION;
     private ProgressBar mProgressBar;
-    int columnCount = 2;
     String sortingOrder;
+
+
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_MOVIE_TITLE = 1;
+    public static final int INDEX_MOVIE_RATING = 2;
+    public static final int INDEX_MOVIE_THUMBNAIL = 3;
+    public static final int INDEX_MOVIE_GENRE = 4;
+
+
+    public static final int ID_MOVIE_LOADER = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         mProgressBar = (ProgressBar) findViewById(R.id.loading);
 
 
-        mAdapter = new Playing_Now_Adapter(movieList);
+        mAdapter = new Playing_Now_Adapter(this, this);
 
 
         GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
@@ -105,96 +121,24 @@ public class MainActivity extends AppCompatActivity
         sortingOrder = preferences.getString(getString(R.string.pref_sort_key),
                 getString(R.string.pref_sort_popular_value));
 
-        jsonReq(sortingOrder);
+       /* intialized the loader*/
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
 
+        //      COMPLETED (13) Call MovieSyncUtils's startImmediateSync method
+        MovieSynIntentUtil.startImmediateSync(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        jsonReq(sortingOrder);
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        jsonReq(sortingOrder);
-
-    }
-
-    private void jsonReq(String sortOrder) {
 
 
-        final String API_KEY_PARAMS = "api_key";
-        Uri uri = Uri.parse(Config.BASE_URL).buildUpon()
-                .appendEncodedPath(sortOrder)
-                .appendQueryParameter(API_KEY_PARAMS, Config.API_KEY)
-                .build();
-
-        String url = uri.toString();
-
-        // making fresh volley request and getting json
-        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject jsonObject) {
-                VolleyLog.d(TAG, "Response: " + jsonObject.toString());
-                mProgressBar.setVisibility(View.INVISIBLE);
-                if (jsonObject != null) {
-                    movieParser(jsonObject);
-
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                mProgressBar.setVisibility(View.INVISIBLE);
-                VolleyLog.d(TAG, "Response: " + volleyError.toString());
-                Toast.makeText(MainActivity.this, "Couldn't get movies", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-
-        // Adding request to volley request queue
-        AppController.getInstance().addToRequestQueue(jsonReq);
-
-    }
-
-    private void movieParser(JSONObject response) {
-        try {
-            JSONArray feedArray = response.getJSONArray("results");
-
-            for (int i = 0; i < feedArray.length(); i++) {
-                JSONObject feedObj = (JSONObject) feedArray.get(i);
-
-                playing_now_item item = new playing_now_item();
-                item.setId(feedObj.getInt("id"));
-                item.setMovie_title(feedObj.getString("title"));
-
-
-                item.setPoster_path(feedObj.getString("poster_path"));
-                item.setOverview(feedObj.getString("overview"));
-                item.setBackdrop(feedObj.getString("backdrop_path"));
-                item.setVote_average(feedObj.getString("vote_average"));
-                item.setRelease_date(feedObj.getString("release_date"));
-
-                // Genre is json array
-                JSONArray genreArry = feedObj.getJSONArray("genre_ids");
-                ArrayList<Integer> genre = new ArrayList<Integer>();
-                for (int j = 0; j < genreArry.length(); j++) {
-                    genre.add((Integer) genreArry.get(j));
-                }
-                item.setGenre(genre);
-
-                movieList.add(item);
-            }
-
-            // notify data changes to list adapater
-            mAdapter.notifyDataSetChanged();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -256,4 +200,57 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+
+            case ID_MOVIE_LOADER:
+                /* URI for all rows of movie data in our movie table */
+                Uri movieQueryUri = MovieContract.MovieEntry.CONTENT_URI;
+
+                return new CursorLoader(this,
+                        movieQueryUri,
+                        MovieContract.MAIN_MOVIE_ROJECTION,
+                        null,
+                        null,
+                        null);
+
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + id);
+        }
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+
+        mAdapter.swapCursor(data);
+        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+        recyclerView2.smoothScrollToPosition(mPosition);
+        if (data.getCount() != 0) showWeatherDataView();
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        mAdapter.swapCursor(null);
+
+    }
+
+    private void showWeatherDataView() {
+        /* First, hide the loading indicator */
+        mProgressBar.setVisibility(View.INVISIBLE);
+        /* Finally, make sure the weather data is visible */
+        recyclerView2.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onClick(int movie_id) {
+        Intent movieDetailIntent = new Intent(MainActivity.this, Movie_Details.class);
+        Uri id_uri = MovieContract.buildMovieUriWithID(movie_id);
+        movieDetailIntent.setData(id_uri);
+        startActivity(movieDetailIntent);
+    }
 }

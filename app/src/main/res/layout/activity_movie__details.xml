@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="250dp"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -24,7 +24,7 @@
             app:expandedTitleMarginEnd="64dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <ImageView
+            <ng.volymat.popularmovies.ui.DynamicHeightNetworkImageView
                 android:id="@+id/photo"
                 style="@style/Theme.Bacon.Backdrop"
                 app:layout_collapseMode="parallax" />
@@ -38,7 +38,7 @@
 
                 <TextView
                     android:layout_marginTop="10dp"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:layout_marginLeft="17dp"
                     android:textColor="#fff"
                     android:fontFamily="sans-serif-condensed"
@@ -46,6 +46,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/movie_genre"/>
+                <TextView
+                    android:id="@+id/date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:textColor="#fff"
+
+                    android:textSize="16sp" />
             </LinearLayout>
 
 
@@ -68,6 +76,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
+        app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

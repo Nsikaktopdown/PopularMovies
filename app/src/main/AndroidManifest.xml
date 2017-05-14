@@ -25,15 +25,26 @@
         <activity
             android:name=".Movie_Details"
             android:label="@string/title_activity_movie__details"
-            android:parentActivityName="ng.volymat.popularmovies.MainActivity"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ng.volymat.popularmovies.MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity"
-            />
+        <activity android:name=".SettingsActivity"></activity>
 
+
+        <!-- Our ContentProvider -->
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="ng.volymat.popularmovies"
+            android:exported="false"/>
+
+        <!-- COMPLETED (8) Register SunshineSyncIntentService in the manifest -->
+        <!--This is required for immediate syncs -->
+        <service
+            android:name=".sync.MovieSynIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

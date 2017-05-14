@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#fff"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="ng.volymat.popularmovies.Movie_Details"
@@ -11,57 +12,66 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="45dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="27dp"
+        android:layout_marginRight="27dp"
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="@string/overvi"
-            android:textColor="@color/light_blue"
-            android:textSize="22sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/overview_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textcolor"
-            android:textSize="15sp" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="@string/release_date"
-            android:textColor="@color/light_blue"
-            android:textSize="22sp" />
-        <TextView
-            android:layout_marginTop="7dp"
-            android:id="@+id/date_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textcolor"
-            android:text="2015"
-            android:textSize="15sp" />
-        <TextView
-            android:layout_marginTop="7dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="@string/rating"
-            android:textColor="@color/light_blue"
-            android:textSize="22sp" />
-        <TextView
-            android:layout_marginTop="7dp"
-            android:id="@+id/rating_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textcolor"
-            android:text="3.4*"
-            android:textSize="15sp" />
+            <TextView
+                android:id="@+id/detail_movie_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:text="hIHFIDFHIDPSUFPOUDPOSUF"
+                android:textColor="@color/textcolor"
+                android:textSize="20sp" />
 
-    </LinearLayout>
+
+        </RelativeLayout>
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="@string/overvi"
+                android:textColor="@color/light_blue"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/overview_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textcolor"
+                android:textSize="13sp" />
+
+
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="7dp"
+                android:text="@string/rating"
+                android:textColor="@color/light_blue"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/rating_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/textcolor"
+                android:textSize="13sp" />
+        </LinearLayout>
+
 
 </android.support.v4.widget.NestedScrollView>

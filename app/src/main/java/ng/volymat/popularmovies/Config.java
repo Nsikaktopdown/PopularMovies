@@ -5,6 +5,6 @@ package ng.volymat.popularmovies;
  */
 
 public  class Config {
-    public static String API_KEY = "API_KEY";
+    public static String API_KEY = "5ecbadc34e688b014eca3b23d34a2723";
     public static String BASE_URL = "https://api.themoviedb.org/3/movie/";
 }

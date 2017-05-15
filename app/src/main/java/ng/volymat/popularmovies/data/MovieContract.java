@@ -79,7 +79,8 @@ public class MovieContract {
             MovieEntry.COLUMN_GENRE,
             MovieEntry.COLUMN_DATE,
             MovieEntry.COLUMN_OVERVIEW,
-            MovieEntry._ID
+            MovieEntry._ID,
+            MovieEntry.COLUMN_MOVIE_ID
     };
     public static String getMovieIDFromUri(Uri uri) {
         return uri.getPathSegments().get(1);

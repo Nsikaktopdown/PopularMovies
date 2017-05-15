@@ -105,7 +105,7 @@ public class MovieSyncTask {
 
                 ContentValues values = new ContentValues();
                 values.put(MovieContract.Favorites.COLUMN_MOVIE_ID_KEY, id);
-                
+
             }
         }
 }

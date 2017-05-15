@@ -22,7 +22,7 @@ android {
 
     ext {
 
-        daggerVersion = "2.7"
+        daggerVersion = "2.6.1"
         supportLibraryVersion = "25.0.1"
         junitTest = "4.12"
         volley = "1.0.19"

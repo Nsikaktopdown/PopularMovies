@@ -71,7 +71,19 @@
                 android:layout_marginTop="2dp"
                 android:textColor="@color/textcolor"
                 android:textSize="13sp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/video_list"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/video_item"
+            android:layout_marginBottom="20dp"/>
+
         </LinearLayout>
+
 
 
 </android.support.v4.widget.NestedScrollView>

@@ -57,7 +57,7 @@ public class MovieDdHelper extends SQLiteOpenHelper {
     public static final String SQL_FAVORITE_TABLE =
             "CREATE TABLE " + MovieContract.Favorites.TABLE_NAME + " (" +
                     MovieContract.Favorites._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
+                    MovieContract.Favorites.COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
 
                     " FOREIGN KEY (" + COLUMN_MOVIE_ID_KEY + ") REFERENCES " +
                     MovieContract.MovieEntry.TABLE_NAME + " (" + MovieContract.MovieEntry._ID + ") " +

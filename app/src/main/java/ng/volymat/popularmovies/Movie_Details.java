@@ -1,5 +1,6 @@
 package ng.volymat.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -13,6 +14,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageButton;
@@ -22,20 +27,37 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
+import ng.volymat.popularmovies.custom.MovieVideoAdapter;
 import ng.volymat.popularmovies.custom.Playing_Now_Adapter;
 import ng.volymat.popularmovies.R;
 import ng.volymat.popularmovies.app.AppController;
 import ng.volymat.popularmovies.data.MovieContract;
 import ng.volymat.popularmovies.model.Movie;
+import ng.volymat.popularmovies.model.MovieVideo;
 import ng.volymat.popularmovies.sync.FavoritesService;
 import ng.volymat.popularmovies.ui.DynamicHeightNetworkImageView;
 import ng.volymat.popularmovies.ui.ImageLoaderHelper;
+import ng.volymat.popularmovies.utils.NetworkUtils;
 
 import static ng.volymat.popularmovies.R.drawable.holder;
 import static ng.volymat.popularmovies.R.id.fab;
 import static ng.volymat.popularmovies.custom.Playing_Now_Adapter.IMAGE_BASE_URL;
+import static ng.volymat.popularmovies.sync.MovieSyncTask.getMoviecontentvalues;
 
 public class Movie_Details extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
@@ -55,15 +77,23 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
     public static final int INDEX_MOVIE_GENRE = 3;
     public static final int INDEX_MOVIE_DATE = 4;
     public static final int INDEX_MOVIE_OVERVIEW = 5;
-    public static final int INDEX_MOVIE_ID = 6;
+    public static final int INDEX_ID = 6;
+    public static  final int INDEX_MOVIE_ID = 7;
+
+
 
 
     private static final int ID_DETAIL_LOADER = 353;
 
-    @Inject
+
     FavoritesService favoritesService;
 
     private Movie movie;
+    private String sort_movie_id;
+
+    private List<MovieVideo> videoList = new ArrayList<>();
+    private RecyclerView recyclerView2;
+    private MovieVideoAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +105,7 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
+        favoritesService = new FavoritesService(getApplicationContext());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         cab = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
@@ -89,11 +120,22 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
         rating_txt = (TextView) findViewById(R.id.rating_text);
         movie_title = (TextView) findViewById(R.id.detail_movie_title);
 
+        recyclerView2 = (RecyclerView) findViewById(R.id.video_list);
+
         movie_id = getIntent().getData();
         /* This connects our Activity into the loader lifecycle. */
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
-
         movie = new Movie();
+
+        mAdapter = new MovieVideoAdapter(this, videoList);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Movie_Details.this);
+        recyclerView2.setLayoutManager(linearLayoutManager);
+        recyclerView2.setItemAnimator(new DefaultItemAnimator());
+        recyclerView2.setHasFixedSize(true);
+        recyclerView2.setAdapter(mAdapter);
+
+
     }
 
     private void updateFab(Movie movie) {
@@ -145,7 +187,7 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
         }
 
 
-        int id = data.getInt(INDEX_MOVIE_ID);
+        int id = data.getInt(INDEX_ID);
 
 
         String backdrop_url = data.getString(INDEX_MOVIE_BACKDROP);
@@ -181,13 +223,25 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
         movie.setRating(rating);
 
 
+        updateFab(movie);
 
-       // updateFab(movie);
+       sort_movie_id = String.valueOf(data.getLong(INDEX_MOVIE_ID));
+        Toast.makeText(this, sort_movie_id, Toast.LENGTH_SHORT).show();
+        perfromVideoRequest(sort_movie_id);
+
+
+
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
     }
 
@@ -215,6 +269,75 @@ public class Movie_Details extends AppCompatActivity implements LoaderManager.Lo
 
     private void showSnackbar(String message) {
         Snackbar.make(cab, message, Snackbar.LENGTH_LONG).show();
+    }
+    public  void perfromVideoRequest(String movie_id) {
+
+
+        String url = NetworkUtils.getVideoRequestUrl(movie_id);
+        // making fresh volley request and getting json
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
+                url, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                VolleyLog.d(TAG, "Response: " + jsonObject.toString());
+
+                try {
+                    getVideoFromJSON(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+
+                VolleyLog.d(TAG, "Response: " + volleyError.toString());
+
+
+            }
+        });
+
+
+        // Adding request to volley request queue
+        AppController.getInstance().addToRequestQueue(jsonReq);
+
+
+    }
+
+    public  void getVideoFromJSON(JSONObject response) throws JSONException {
+
+
+
+
+        JSONArray feedArray = response.getJSONArray("results");
+
+
+        for (int i = 0; i < feedArray.length(); i++) {
+            JSONObject feedObj = (JSONObject) feedArray.get(i);
+
+            MovieVideo movieVideo = new MovieVideo();
+
+            movieVideo.setId(feedObj.getString("id"));
+            movieVideo.setName(feedObj.getString("name"));
+            movieVideo.setKey(feedObj.getString("key"));
+            movieVideo.setSite(feedObj.getString("site"));
+            movieVideo.setType(feedObj.getString("type"));
+            videoList.add(movieVideo);
+
+
+
+
+        }
+
+
+
+
+
     }
 
 }

@@ -31,7 +31,7 @@ public class NetworkUtils {
     public static String getUrl(Context context){
 
       String sortOrderpref=   MoviePreferences.sortOrder(context);
-        return buildRequestUrl(sortOrderpref);
+        return buildMovieRequestUrl(sortOrderpref);
     }
 
 
@@ -39,10 +39,22 @@ public class NetworkUtils {
 
 
 
-    private static String buildRequestUrl(String sortOrder) {
+    private static String buildMovieRequestUrl(String sortOrder) {
         final String API_KEY_PARAMS = "api_key";
         Uri uri = Uri.parse(Config.BASE_URL).buildUpon()
                 .appendEncodedPath(sortOrder)
+                .appendQueryParameter(API_KEY_PARAMS, Config.API_KEY)
+                .build();
+
+        String url = uri.toString();
+        return url;
+    }
+
+    public static String getVideoRequestUrl(String movie_id) {
+        final String API_KEY_PARAMS = "api_key";
+        Uri uri = Uri.parse(Config.BASE_URL).buildUpon()
+                .appendEncodedPath(movie_id)
+                .appendEncodedPath("videos")
                 .appendQueryParameter(API_KEY_PARAMS, Config.API_KEY)
                 .build();
 

@@ -164,12 +164,12 @@ public class MovieProvider extends ContentProvider {
 
             }
 
-            case  FAVORITES:{
+            case  FAVORITES:
 
                 cursor = getMoviesFromReferenceTable(MovieContract.Favorites.TABLE_NAME,
                         projection, selection, selectionArgs, sortOrder);
                 break;
-            }
+
             default:
                 throw new
 
@@ -187,7 +187,7 @@ public class MovieProvider extends ContentProvider {
         return null;
     }
 
-    @Nullable
+
     @Override
     public Uri insert(@NonNull Uri uri,  ContentValues values) {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();

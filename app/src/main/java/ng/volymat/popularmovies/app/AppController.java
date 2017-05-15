@@ -8,12 +8,14 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+import dagger.internal.DaggerCollections;
+
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
 
     private RequestQueue mRequestQueue;
-
+    private NetworkComponent networkComponent;
 
     private static AppController mInstance;
 
@@ -21,7 +23,10 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+
+
     }
+
 
     public static synchronized AppController getInstance() {
         return mInstance;
@@ -52,4 +57,5 @@ public class AppController extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
+
 }
